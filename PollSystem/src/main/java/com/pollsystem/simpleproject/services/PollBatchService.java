@@ -37,7 +37,6 @@ public class PollBatchService {
         System.out.println("Partito scheduler per segnalare expired i poll e inviare mail...");
         List<Poll> expiringPolls = pollRepository.findExpiringPollsToday();
         System.out.println("poll trovati: " + expiringPolls);
-
         for (Poll poll : expiringPolls) {
             this.processPoll(poll);
         }
@@ -49,7 +48,7 @@ public class PollBatchService {
         //setta expired, calcola la % vittoria e triggera invio messaggio
         WinnerOption winnerOption = new WinnerOption(poll.getId(),pollService.GetWinningOption(poll.getId()) , pollService.GetPercentWinner(poll.getId()));
         winnerOptionRepository.save(winnerOption);
-        poll.setStatus("EXPIREEEeD2");
+        poll.setStatus("EXPIRED");
         pollRepository.save(poll);
         sendPollWinnerMessage(poll, winnerOption);
     }

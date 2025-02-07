@@ -28,20 +28,11 @@ public class UserController {
 
     @GetMapping(value = "/GetUsers")
     public ResponseEntity<?> getUsers(HttpServletRequest request){
-
-        //System.out.println(request.toString());
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String auth_username = authentication.getName();
-            System.out.println("UserController - Username: " + auth_username);
-            //boolean validToken = userService.validtoken(user);
-            //if (userService.validtoken(user)){
-                //System.out.println("Login ok!");
-                return ResponseEntity.status(HttpStatus.OK).body(userService.GetListUserDTO());
-            //}else{
-            //    System.out.println("Login non ok!");
-            //    return new ResponseEntity<List<UsersDTO>>(HttpStatus.BAD_REQUEST);
-            //}
+            //System.out.println("UserController - Username: " + auth_username);
+            return ResponseEntity.status(HttpStatus.OK).body(userService.GetListUserDTO());
         }catch(ExpiredJwtException e){
             System.out.println("UserController - Login non ok - JWT Scaduto - ERRORE E: "+ e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login non ok - JWT Scaduto - ERRORE E: "+ e.getMessage());
@@ -68,14 +59,11 @@ public class UserController {
     @PostMapping(value = "/Login")
     public ResponseEntity<?> Login(
             @RequestBody LoginModelDTO loginmodel){
-
         String username = loginmodel.getUsername();
         String password = loginmodel.getPassword();
-
         if (userService.checkPasswordUser(username,password)){
             Users user = userService.GetUserbyUsername(username);
             String token = userService.generateToken(user);
-            System.out.println(token);
             user.setToken(token);
             userService.save(user);
             System.out.println("Login eseguito con successo - JWT: " + token);

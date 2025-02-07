@@ -33,7 +33,7 @@ public class OptionController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("OptionController - Authenticated Username: " + username);
+        //System.out.println("OptionController - Authenticated Username: " + username);
 
         Users user = userService.GetUserbyUsername(username);
         Poll poll = pollService.GetPollById(id);
@@ -46,7 +46,7 @@ public class OptionController {
             @PathVariable(value = "optionId") Long optionId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("OptionController - Authenticated Username: " + username);
+        //System.out.println("OptionController - Authenticated Username: " + username);
 
         Poll poll = pollService.GetPollById(id);
         return optionService.GetOptionPoll(poll,optionId);
@@ -59,7 +59,7 @@ public class OptionController {
             @PathVariable(value = "optionId") Long optionId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("OptionController - Authenticated Username: " + username);
+        //System.out.println("OptionController - Authenticated Username: " + username);
 
         Users user = userService.GetUserbyUsername(username);
         Poll poll = pollService.GetPollById(id);
@@ -74,7 +74,7 @@ public class OptionController {
             @RequestBody Option option){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("OptionController - Authenticated Username: " + username);
+        //System.out.println("OptionController - Authenticated Username: " + username);
 
         Users user = userService.GetUserbyUsername(username);
         Poll poll = pollService.GetPollById(id);
@@ -88,7 +88,7 @@ public class OptionController {
             @PathVariable(value = "optionId") Long optionId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("OptionController - Authenticated Username: " + username);
+        //System.out.println("OptionController - Authenticated Username: " + username);
 
         Users user = userService.GetUserbyUsername(username);
         Poll poll = pollService.GetPollById(id);

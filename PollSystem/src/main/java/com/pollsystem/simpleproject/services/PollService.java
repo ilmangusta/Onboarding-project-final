@@ -3,6 +3,8 @@ package com.pollsystem.simpleproject.services;
 import com.pollsystem.simpleproject.domain.Poll;
 import com.pollsystem.simpleproject.domain.Users;
 import com.pollsystem.simpleproject.model.PollDTO;
+import com.pollsystem.simpleproject.model.PollListPage;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -33,4 +35,7 @@ public interface PollService {
     Long GetWinningOption(Long id);
 
     int GetPercentWinner(Long id);
+
+    //Per gestire la paginazione
+    PollListPage getPollsPage(String search,int page, int size);
 }

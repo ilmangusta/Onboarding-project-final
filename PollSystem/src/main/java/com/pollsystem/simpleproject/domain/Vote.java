@@ -1,5 +1,6 @@
 package com.pollsystem.simpleproject.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class Vote {
     private Long id;
     private Date votedAt;
 
+    @JsonIgnore
     @ManyToOne(
             cascade = CascadeType.PERSIST
     )
@@ -32,6 +34,8 @@ public class Vote {
     public String toString() {
         return "Vote{" +
                 "id=" + id +
+                ", votedAt=" + votedAt +
+                ", option=" + option +
                 '}';
     }
 }

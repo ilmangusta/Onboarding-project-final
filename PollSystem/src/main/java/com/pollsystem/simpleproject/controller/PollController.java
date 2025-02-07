@@ -6,11 +6,13 @@ import com.pollsystem.simpleproject.domain.Poll;
 import com.pollsystem.simpleproject.domain.Users;
 import com.pollsystem.simpleproject.mapper.PollMapper;
 import com.pollsystem.simpleproject.model.PollDTO;
+import com.pollsystem.simpleproject.model.PollListPage;
 import com.pollsystem.simpleproject.services.OptionService;
 import com.pollsystem.simpleproject.services.PollService;
 import com.pollsystem.simpleproject.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -38,7 +40,7 @@ public class PollController {
     ///  ------------ polls api ----------------------------
 
 
-    @GetMapping(value = "/polls")
+    @GetMapping(value = "/pollsV2")
     public ResponseEntity<List<PollDTO>> getListPoll(HttpServletRequest request){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -54,9 +56,17 @@ public class PollController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         System.out.println("PollController - Username: " + username);
-        System.out.println("PollDTO: " + pollDTO);
+        //System.out.println("PollDTO: " + pollDTO);
         Users user = userService.GetUserbyUsername(username);
         return pollService.AddPoll(pollDTO,user,username);
+    }
+
+    @GetMapping(value = "/polls")
+    public PollListPage getPolls(
+            @RequestParam String search,
+            @RequestParam int page,
+            @RequestParam int size) {
+        return pollService.getPollsPage(search,page, size);
     }
 
     @GetMapping(value = "/polls/{id}")
@@ -70,7 +80,7 @@ public class PollController {
             @PathVariable(value = "id") Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("PollController - Username: " + username);
+        //System.out.println("PollController - Username: " + username);
         Users user = userService.GetUserbyUsername(username);
         return pollService.DeletePoll(id,user);
     }
@@ -82,23 +92,21 @@ public class PollController {
             @RequestBody PollDTO pollDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String auth_username = authentication.getName();
-        System.out.println("PollController - Username: " + auth_username);
+        //System.out.println("PollController - Username: " + auth_username);
         Users user = userService.GetUserbyUsername(auth_username);
         Poll poll = pollService.GetPollById(id);
         return pollService.UpdatePoll(pollDTO,poll,user);
     }
 
-    @GetMapping(value = "/polls-details/{id}-TODO")
+    @GetMapping(value = "/polls-details/{id}")
     public ResponseEntity<?> updatePoll(
             @PathVariable(value = "id") Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String auth_username = authentication.getName();
-        System.out.println("PollController - Username: " + auth_username);
-
+        //System.out.println("PollController - Username: " + auth_username);
         Users user = userService.GetUserbyUsername(auth_username);
         Poll poll = pollService.GetPollById(id);
         return pollService.GetPollDetails(poll,user);
-        //manca poca roba //provsa modifiche dev
     }
 
     @GetMapping(value = "/polls/{id}/vote-TODO")
@@ -106,8 +114,7 @@ public class PollController {
             @PathVariable(value = "id") Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String auth_username = authentication.getName();
-        System.out.println("PollController - Username: " + auth_username);
-
+        //System.out.println("PollController - Username: " + auth_username);
         Users user = userService.GetUserbyUsername(auth_username);
         Poll poll = pollService.GetPollById(id);
         return pollService.GetPollDetails(poll,user);
