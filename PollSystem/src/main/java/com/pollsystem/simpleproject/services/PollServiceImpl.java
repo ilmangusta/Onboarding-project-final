@@ -6,6 +6,7 @@ import com.pollsystem.simpleproject.model.PollDTO;
 import com.pollsystem.simpleproject.model.PollDetails;
 import com.pollsystem.simpleproject.repositories.PollRepository;
 import com.pollsystem.simpleproject.repositories.UsersRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -170,20 +171,24 @@ public class PollServiceImpl implements PollService {
         }
     }
 
+    // consente di gestire le transazioni in modo dichiarativo, senza dover scrivere codice esplicito per iniziare, commettere o annullare una transazione.
+    @Transactional
     @Override
     public Long GetWinningOption(Long id){
-        int winningOption = 0;
-        Long optionId = (long) 0;
-        Set<Integer> listOfVote = new HashSet<>();
+        int OptionNumberVotes = -1;
+        Long OptionId = (long) 0;
         for (Option option: this.GetPollById(id).getOptions()){
-            if (option.getVotes().size() > winningOption){
-                optionId = option.getId();
+            System.out.println("Voti per option: " + option.getVotes().size());
+            if (option.getVotes().size() > OptionNumberVotes){
+                OptionNumberVotes = option.getVotes().size();
+                OptionId = option.getId();
             }
         }
-        System.out.println("Winning option: " + optionId);
-        return optionId;
+        System.out.println("Winning option: " + OptionId + " with votes: " + OptionNumberVotes);
+        return OptionId;
     }
 
+    @Transactional
     @Override
     public int GetPercentWinner(Long id){
         //1 12

@@ -19,4 +19,15 @@ public class PollWinnerMessage {
     private int winnerPercent;
     private Date expiredAt;
     private String ownerEmail;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "pollQuestion='" + pollQuestion + '\'' +
+                ", winnerOption='" + winnerOption + '\'' +
+                ", winnerPercent=" + winnerPercent +
+                ", expiredAt=" + expiredAt +
+                ", ownerEmail='" + ownerEmail + '\'' +
+                '}';
+    }
 }

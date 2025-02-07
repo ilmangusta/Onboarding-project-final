@@ -1,5 +1,6 @@
 package com.pollsystem.simpleproject.services;
 
+import com.pollsystem.simpleproject.repositories.WinnerOptionRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import com.pollsystem.simpleproject.domain.Option;
@@ -9,6 +10,7 @@ import com.pollsystem.simpleproject.domain.WinnerOption;
 import com.pollsystem.simpleproject.repositories.PollRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
@@ -26,27 +28,35 @@ public class PollBatchService {
     private OptionService optionService;
     @Autowired
     private RabbitMQProducer rabbitMQProducer;
+    @Autowired
+    private WinnerOptionRepository winnerOptionRepository;
 
 
-    @Scheduled(cron = "0 40 15 * * ?") // Ogni giorno a mezzanotte
+    @Scheduled(cron = "59 * * * * ?") // Ogni giorno a mezzanotte
     public void processExpiredPolls() {
         System.out.println("Partito scheduler per segnalare expired i poll e inviare mail...");
         List<Poll> expiringPolls = pollRepository.findExpiringPollsToday();
+        System.out.println("poll trovati: " + expiringPolls);
+
         for (Poll poll : expiringPolls) {
             this.processPoll(poll);
         }
     }
 
+    //consente di gestire le transazioni in modo dichiarativo, senza dover scrivere codice esplicito per iniziare, commettere o annullare una transazione.
+    @Transactional
     private void processPoll(Poll poll) {
         //setta expired, calcola la % vittoria e triggera invio messaggio
-        poll.setStatus("EXPIRED");
         WinnerOption winnerOption = new WinnerOption(poll.getId(),pollService.GetWinningOption(poll.getId()) , pollService.GetPercentWinner(poll.getId()));
+        winnerOptionRepository.save(winnerOption);
+        poll.setStatus("EXPIREEEeD2");
         pollRepository.save(poll);
         sendPollWinnerMessage(poll, winnerOption);
     }
 
     private void sendPollWinnerMessage(Poll poll, WinnerOption winnerOption) {
         //costruisce il messaggio ed invia
+        System.out.println(winnerOption);
         if (winnerOption == null) return;
         PollWinnerMessage message = new PollWinnerMessage(
                 poll.getQuestion(),
@@ -55,7 +65,7 @@ public class PollBatchService {
                 poll.getExpiresAt(),
                 userService.GetUserbyUsername(poll.getOwner()).getEmail()
         );
-        rabbitMQProducer.sendMessage("poll.winner.mail", message);
+        rabbitMQProducer.sendMessage("poll.winner.mail", message.toString());
     }
 
 
