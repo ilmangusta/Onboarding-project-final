@@ -28,20 +28,24 @@ public class JWTService {
 
         Map<String, Objects> mapToken = new HashMap<>();
         String username = user.getUsername();
-        //Jwts
-        //        .claims()
-        //        .put(mapToken)
-        //        .setSubject(username)
-        //        .setIssuedAt(new Date(System.currentTimeMillis()))
-        //        .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-        //        .signWith();
-        return Jwts.builder()
+
+        String token = Jwts.builder()
                 .setSubject(user.getUsername()) // Imposta il payload con l'username
                 //.setSubject(user.getPassword())
                 .setIssuedAt(new Date()) // Data di emissione
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Scadenza
                 .signWith(getKey(), SignatureAlgorithm.HS256) // Firma con algoritmo HMAC-SHA256
                 .compact();
+
+        Date date = Jwts.parserBuilder()
+                .setSigningKey(getKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+        System.out.println("Data scadenza: " + date);
+
+        return token;
     }
 
     // 🔹 Estrai l'username dal token

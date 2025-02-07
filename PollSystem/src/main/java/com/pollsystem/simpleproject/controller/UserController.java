@@ -1,9 +1,7 @@
 package com.pollsystem.simpleproject.controller;
 
 import com.pollsystem.simpleproject.domain.Users;
-import com.pollsystem.simpleproject.model.LoginModelDTO;
-import com.pollsystem.simpleproject.model.RegisterModelDTO;
-import com.pollsystem.simpleproject.model.UsersDTO;
+import com.pollsystem.simpleproject.model.*;
 import com.pollsystem.simpleproject.services.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 @RestController
 public class UserController {
@@ -47,20 +46,21 @@ public class UserController {
     }
 
     @PostMapping(value = "/Registration")
-    public ResponseEntity<String>  Registration(
+    public ResponseEntity<?>  Registration(
             @RequestBody RegisterModelDTO register) {
         Users user = new Users(register.getUsername(), register.getPassword(), register.getEmail());
         if (userService.register(user)) {
             System.out.println("Utente creato con successo");
             return ResponseEntity.status(HttpStatus.CREATED).body("Utente creato con successo");
         } else {
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse(new Date(System.currentTimeMillis()),0,"Impossibile creare l'utente", register.getUsername());
             System.out.println("Impossibile creare l'utente");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile creare l'utente");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
 
     @PostMapping(value = "/Login")
-    public ResponseEntity<String> Login(
+    public ResponseEntity<?> Login(
             @RequestBody LoginModelDTO loginmodel){
 
         String username = loginmodel.getUsername();
@@ -74,8 +74,8 @@ public class UserController {
             System.out.println(token);
             user.setToken(token);
             userService.save(user);
-            System.out.println("Utente loggato con successo - JWT: " + token);
-            return ResponseEntity.status(HttpStatus.OK).body("Login eseguito con successo");
+            System.out.println("Login eseguito con successo - JWT: " + token);
+            return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(token,new Date(System.currentTimeMillis())));
         }else if (res == -1) {
             System.out.println("Login Fallito - Username errato");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login fallito");
