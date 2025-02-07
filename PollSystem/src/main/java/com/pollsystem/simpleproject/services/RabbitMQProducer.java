@@ -10,7 +10,6 @@ public class RabbitMQProducer {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
-
     public void sendMessage(String queueName, Object message) {
         rabbitTemplate.convertAndSend(queueName, message);
     }

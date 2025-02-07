@@ -4,17 +4,19 @@ import com.pollsystem.simpleproject.domain.*;
 import com.pollsystem.simpleproject.mapper.PollMapper;
 import com.pollsystem.simpleproject.model.PollDTO;
 import com.pollsystem.simpleproject.model.PollDetails;
+import com.pollsystem.simpleproject.model.PollListPage;
 import com.pollsystem.simpleproject.repositories.PollRepository;
 import com.pollsystem.simpleproject.repositories.UsersRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -170,20 +172,27 @@ public class PollServiceImpl implements PollService {
         }
     }
 
+    // consente di gestire le transazioni in modo dichiarativo, senza dover scrivere codice esplicito per iniziare, commettere o annullare una transazione.
+    @Transactional
     @Override
     public Long GetWinningOption(Long id){
-        int winningOption = 0;
-        Long optionId = (long) 0;
-        Set<Integer> listOfVote = new HashSet<>();
+        int OptionNumberVotes = -1;
+        Long OptionId = (long) 0;
         for (Option option: this.GetPollById(id).getOptions()){
-            if (option.getVotes().size() > winningOption){
-                optionId = option.getId();
+            //se un poll esiste ma non ha opzioni va in errore -> lancio eccez
+            if (option.getVotes().size() > OptionNumberVotes){
+                OptionNumberVotes = option.getVotes().size();
+                OptionId = option.getId();
             }
         }
-        System.out.println("Winning option: " + optionId);
-        return optionId;
+        if (OptionId == 0){
+            throw new NullPointerException();
+        }else {
+            return OptionId;
+        }
     }
 
+    @Transactional
     @Override
     public int GetPercentWinner(Long id){
         //1 12
@@ -196,14 +205,40 @@ public class PollServiceImpl implements PollService {
         int max = 0;
         int totalVotes = 0;
         for (Option option: this.GetPollById(id).getOptions()){
-            //System.out.println(option.getVotes().size());
             totalVotes += option.getVotes().size();
             if (option.getVotes().size() > max){
                 max = option.getVotes().size();
             }
         }
-        System.out.println("numero totali opzioni poll: " +this.GetPollById(id).getOptions().size());
         return max > 0 ? ((max*100)/totalVotes) : 0;
     }
 
+    //Per gestire la paginazione
+    @Override
+    public PollListPage getPollsPage(String search, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Poll> pollPage;
+        if (search != null && !search.isEmpty()) {
+            // mi hanno passato il parametro search
+            pollPage = pollRepository.findAll(search, pageRequest);
+        } else {
+            // non ho search e prendo tutto
+            pollPage = pollRepository.findAll(pageRequest);
+        }
+        //converto la lista di poll in lista di pollDTO
+        List<PollDTO> pollDTOList = pollPage
+                .getContent()
+                .stream()
+                .map(poll -> { return pollMapper.PollToPollDTO(poll);})
+                .collect(Collectors.toList());
+
+        return new PollListPage(
+                pollPage.isFirst(),
+                pollPage.isLast(),
+                pollPage.getSize(),
+                pollPage.getTotalElements(),
+                pollPage.getTotalPages(),
+                pollPage.getNumber(),
+                pollDTOList);
+    }
 }

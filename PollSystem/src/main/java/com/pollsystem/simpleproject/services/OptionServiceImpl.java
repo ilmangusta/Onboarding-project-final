@@ -54,10 +54,13 @@ public class OptionServiceImpl implements OptionService{
 
     @Override
     public ResponseEntity<?> AddOption(Poll poll, Option option, Users auth_user){
-
         if (poll == null){
             System.out.println("Poll non esiste");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Poll non esiste");
+        }
+        if(poll.getStatus().equals("EXPIRED")){
+            System.out.println("Poll scaduto");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Poll scaduto");
         }
         else if(auth_user.getUsername().equals(poll.getOwner())){
             Option optionsave = new Option(option.getMessage(),option.getCreatedAt());
@@ -97,6 +100,10 @@ public class OptionServiceImpl implements OptionService{
             System.out.println("Poll non esiste");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Poll non esiste");
         }
+        if(poll.getStatus().equals("EXPIRED")){
+            System.out.println("Poll scaduto");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Poll scaduto");
+        }
         if(auth_user.getUsername().equals(poll.getOwner())){
             for (Option option: poll.getOptions()){
                 if (option.getId().equals(optionId)){
@@ -129,6 +136,10 @@ public class OptionServiceImpl implements OptionService{
             System.out.println("Poll non esiste");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Poll non esiste");
         }
+        if(poll.getStatus().equals("EXPIRED")){
+            System.out.println("Poll scaduto");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Poll scaduto");
+        }
         if(auth_user.getUsername().equals(poll.getOwner())){
             for (Option option: poll.getOptions()){
                 if (option.getId().equals(optionId)){
@@ -154,11 +165,14 @@ public class OptionServiceImpl implements OptionService{
 
     @Override
     public ResponseEntity<?> VoteOptionPoll(Poll poll, Long optionId, Users auth_user){
-
         ///  da fare
         if (poll == null){
             System.out.println("Poll non esiste");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Poll non esiste");
+        }
+        if(poll.getStatus().equals("EXPIRED")){
+            System.out.println("Poll scaduto");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Poll scaduto");
         }
         if(auth_user.getUsername().equals(poll.getOwner())) {
             //proprietario non puo votare

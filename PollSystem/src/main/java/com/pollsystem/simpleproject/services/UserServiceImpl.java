@@ -146,7 +146,6 @@ public class UserServiceImpl implements UserService {
             System.out.println("Password codificata: " + encoder.encode(password));
             System.out.println("Passowrd vera account: " + user.getPassword());
             System.out.println("Password decodificata: " + encoder.matches(password,user.getPassword()));
-            //if (user.getPassword().equals(password)){
             return encoder.matches(password, user.getPassword());
         }
     }
