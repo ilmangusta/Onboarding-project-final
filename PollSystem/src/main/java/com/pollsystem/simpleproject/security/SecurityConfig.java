@@ -30,13 +30,9 @@ public class SecurityConfig {
         //http.csrf(customizer -> customizer.disable());
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(request -> request
-                        .requestMatchers("sessionInfo","Registration", "Login", "Login2")
+                        .requestMatchers("sessionInfo","Registration", "Login")
                         .permitAll());
-        //http.authorizeHttpRequests(request -> request
-        //        .requestMatchers("books","GetUsers")
-        //        .authenticated());
         http.authorizeHttpRequests(request -> request.anyRequest().authenticated());
-        //http.httpBasic(Customizer.withDefaults());
         http.formLogin(Customizer.withDefaults());
         //STATELESS mi mantiene lo stato del form login in continuazione
         //http.sessionManagement(session -> session.sessionCreationPolicy(STATELESS));

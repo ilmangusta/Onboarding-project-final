@@ -192,6 +192,7 @@ public class PollServiceImpl implements PollService {
         //5 10
         int max = 0;
         for (Option option: this.GetPollById(id).getOptions()){
+            System.out.println(option.getVotes().size());
             if (option.getVotes().size() > max){
                 max = option.getVotes().size();
             }

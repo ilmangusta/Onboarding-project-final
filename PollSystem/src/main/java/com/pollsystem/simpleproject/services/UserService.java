@@ -35,6 +35,6 @@ public interface UserService {
 
     Users GetUserbyUsername(String username);
 
-    int checkPasswordUser(String username, String password);
+    boolean checkPasswordUser(String username, String password);
 
 }
