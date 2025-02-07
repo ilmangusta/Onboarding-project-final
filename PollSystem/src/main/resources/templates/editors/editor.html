@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Editors List</h1>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>PhisicalAddress</th>
+  </tr>
+  <tr th:each="editor : ${editors}">
+    <td th:text="${editor.id}">123</td>
+    <td th:text="${editor.Name}">123</td>
+    <td th:text="${editor.PhisicalAddress}"> Spring in Action</td>
+  </tr>
+</table>
+</body>
+</html>
