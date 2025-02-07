@@ -3,13 +3,16 @@ package com.pollsystem.simpleproject.services;
 import com.pollsystem.simpleproject.domain.Option;
 import com.pollsystem.simpleproject.domain.Poll;
 import com.pollsystem.simpleproject.domain.Users;
+import com.pollsystem.simpleproject.domain.Vote;
 import com.pollsystem.simpleproject.repositories.OptionRepository;
 import com.pollsystem.simpleproject.repositories.PollRepository;
+import com.pollsystem.simpleproject.repositories.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +22,9 @@ public class OptionServiceImpl implements OptionService{
     @Autowired
     private OptionRepository optionRepository;
     @Autowired
-    protected PollRepository pollRepository;
+    private PollRepository pollRepository;
+    @Autowired
+    private  VoteRepository voteRepository;
 
     @Override
     public Iterable<Option> findAll() {
@@ -150,7 +155,6 @@ public class OptionServiceImpl implements OptionService{
     @Override
     public ResponseEntity<?> VoteOptionPoll(Poll poll, Long optionId, Users auth_user){
 
-
         ///  da fare
         if (poll == null){
             System.out.println("Poll non esiste");
@@ -159,26 +163,22 @@ public class OptionServiceImpl implements OptionService{
         if(auth_user.getUsername().equals(poll.getOwner())) {
             //proprietario non puo votare
             System.out.println("Proprietario non puo votare");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Proprietario non può votare");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Accesso non autorizzato");
         }else {
             for (Option option : poll.getOptions()) {
                 if (option.getId().equals(optionId)) {
-                    if (option.getVotes().isEmpty()) {
-                        //posso modificare la option
-                        optionRepository.deleteById(optionId);
-                        System.out.println("Option eliminata con successo");
-                        return ResponseEntity.status(HttpStatus.CREATED).body("Option cancellata");
-                    } else {
-                        System.out.println("Option gia votata - Impossibile eliminare");
-                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Option gia votata - Impossibile eliminare");
-                    }
+                    Vote vote = new Vote(new Date(System.currentTimeMillis()));
+                    option.getVotes().add(vote);
+                    vote.setOption(option);
+                    optionRepository.save(option);
+                    voteRepository.save(vote);
+                    System.out.println("Vote aggiunto con successo");
+                    return ResponseEntity.status(HttpStatus.CREATED).body(option);
                 }
             }
             System.out.println("Option non trovata per il poll selezionato");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Option non trovata per il poll selezionato");
-
         }
     }
-
 
 }

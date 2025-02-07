@@ -170,7 +170,7 @@ public class PollServiceImpl implements PollService {
         }
     }
 
-
+    @Override
     public Long GetWinningOption(Long id){
         int winningOption = 0;
         Long optionId = (long) 0;
@@ -184,20 +184,26 @@ public class PollServiceImpl implements PollService {
         return optionId;
     }
 
+    @Override
     public int GetPercentWinner(Long id){
         //1 12
         //2 34
         //3 2
         //4 9
         //5 10
+        //total votes = 62
+        //best votes = 32
         int max = 0;
+        int totalVotes = 0;
         for (Option option: this.GetPollById(id).getOptions()){
+            //System.out.println(option.getVotes().size());
+            totalVotes += option.getVotes().size();
             if (option.getVotes().size() > max){
                 max = option.getVotes().size();
             }
         }
         System.out.println("numero totali opzioni poll: " +this.GetPollById(id).getOptions().size());
-        return max == 0 ? 0 : (max/(this.GetPollById(id).getOptions().size()));
+        return max > 0 ? ((max*100)/totalVotes) : 0;
     }
 
 }

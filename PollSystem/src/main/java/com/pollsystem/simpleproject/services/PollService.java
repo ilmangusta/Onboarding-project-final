@@ -29,4 +29,8 @@ public interface PollService {
     ResponseEntity<?> AddPoll(PollDTO pollDTO, Users user, String Auth_user);
 
     ResponseEntity<?> GetPollDetails(Poll poll, Users user);
+
+    Long GetWinningOption(Long id);
+
+    int GetPercentWinner(Long id);
 }

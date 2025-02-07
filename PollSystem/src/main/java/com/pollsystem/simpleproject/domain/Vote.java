@@ -24,6 +24,10 @@ public class Vote {
     @JoinColumn(name = "option_id")
     private Option option;
 
+    public Vote(Date votedAt) {
+        this.votedAt = votedAt;
+    }
+
     @Override
     public String toString() {
         return "Vote{" +

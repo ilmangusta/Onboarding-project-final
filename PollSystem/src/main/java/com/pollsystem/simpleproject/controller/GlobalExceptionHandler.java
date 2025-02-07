@@ -1,5 +1,6 @@
 package com.pollsystem.simpleproject.controller;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,11 +38,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Accesso non autorizzato");
     }
 
-    // Eccezioni generiche → 500
-   //@ExceptionHandler(Exception.class)
-   //public ResponseEntity<String> handleGenericException(Exception ex) {
-   //    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server");
-   //}
+    // Token scaduto → 401
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<String> handleExpireToken(ExpiredJwtException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token Scaduto - Accesso non autorizzato");
+    }
+
+    //Eccezioni generiche → 500
+   @ExceptionHandler(Exception.class)
+   public ResponseEntity<String> handleGenericException(Exception ex) {
+       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server");
+   }
 
 
 }

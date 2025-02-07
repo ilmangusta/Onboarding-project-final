@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
             System.out.println("Utente loggato con successo - JWT: " + token);
             return ("Utente loggato con successo - JWT: " + token);
         }
-        System.out.println("Login failed: " + authentication.getDetails().toString());
+        System.out.println("Login Fallito: " + authentication.getDetails().toString());
         return "Login Fallito";
     }
 
@@ -137,25 +137,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int checkPasswordUser(String username, String password){
-
-        //System.out.println("Passord passata: " +password);
-        //System.out.println("Password codificata: " + encoder.encode(password));
-
+    public boolean checkPasswordUser(String username, String password){
         Users user = this.GetUserbyUsername(username);
         if ( user == null) {
-            return -1;
+            return false;
         }else{
             System.out.println("Passord passata: " +password);
             System.out.println("Password codificata: " + encoder.encode(password));
             System.out.println("Passowrd vera account: " + user.getPassword());
             System.out.println("Password decodificata: " + encoder.matches(password,user.getPassword()));
-            if (encoder.matches(password,user.getPassword())){
             //if (user.getPassword().equals(password)){
-                return 1;
-            }else {
-                return -2;
-            }
+            return encoder.matches(password, user.getPassword());
         }
     }
 

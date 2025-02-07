@@ -1,11 +1,14 @@
 package com.pollsystem.simpleproject.security;
 
 import com.pollsystem.simpleproject.services.JWTService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     //customfilter added before the UsernamePasswordAuthenticationFilter
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ExpiredJwtException {
         //before the UPAF im getting the bearer token
         // Bearer ${token}
         String authHeader = request.getHeader("Authorization");
@@ -36,16 +39,17 @@ public class JwtFilter extends OncePerRequestFilter {
         System.out.println("JwtFilter - AuthHeader = " + authHeader);
         System.out.println("JwtFilter - Cookies = " + cookies);
 
-        //try{
-            if (authHeader != null && authHeader.startsWith("Bearer")){
+        //try {
+            //vuol dire che non è autenticato con il token jwt
+            if (authHeader != null && authHeader.startsWith("Bearer")) {
                 token = authHeader.substring(7);
                 username = jwtService.extractUsername(token);
             }
             //controllo gia qui che l'utente non sia un campo vuoto e IMPORTANTE controllo che non sia gia autenticato
             if (username == null) {
-                System.out.println("JwtFilter - Utente insesistente");
-            }else{
-                if (SecurityContextHolder.getContext().getAuthentication() == null){
+                System.out.println("JwtFilter - Utente inesistente");
+            } else {
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
                     //cerco di ottenere l'oggetto userdetails con tutte le info dell utente
                     UserDetails userdetails = myUserDetailService.loadUserByUsername(username);
                     //System.out.println("JwtFilter - Utente è ok e LOGGATO: " + userdetails.getUsername());
@@ -58,13 +62,13 @@ public class JwtFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                     System.out.println("JwtFilter - Login ok dal JWT Filter!");
-                }else{
+                } else {
                     System.out.println("JwtFilter - Utente è gia LOGGATO");
                 }
             }
-            filterChain.doFilter(request,response);
-        //}catch (){}
-        //catch (ExpiredJwtException e ){
+            filterChain.doFilter(request, response);
+            //}catch (){}
+        //}catch (ExpiredJwtException e ){
         //    System.out.println("JwtFilter - JWT Scaduto!");
         //}catch (Exception e){
         //    System.out.println("JwtFilter - Other Error!");

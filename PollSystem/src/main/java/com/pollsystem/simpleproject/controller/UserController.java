@@ -6,8 +6,11 @@ import com.pollsystem.simpleproject.services.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -18,30 +21,33 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Value("${app.config.expirationTime}")
+    private int EXPIRATION_TIME;
+
     ///---------------- authentication api ----------------------
 
     @GetMapping(value = "/GetUsers")
-    public ResponseEntity<List<UsersDTO>> getUsers(HttpServletRequest request){
+    public ResponseEntity<?> getUsers(HttpServletRequest request){
 
         //System.out.println(request.toString());
         try {
-            System.out.println("UserController - Username: " + request.getRemoteUser());
-            String username = request.getRemoteUser();
-            Users user = userService.GetUserbyUsername(username);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String auth_username = authentication.getName();
+            System.out.println("UserController - Username: " + auth_username);
             //boolean validToken = userService.validtoken(user);
             //if (userService.validtoken(user)){
                 //System.out.println("Login ok!");
-                return new ResponseEntity<List<UsersDTO>>(userService.GetListUserDTO(), HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).body(userService.GetListUserDTO());
             //}else{
             //    System.out.println("Login non ok!");
             //    return new ResponseEntity<List<UsersDTO>>(HttpStatus.BAD_REQUEST);
             //}
         }catch(ExpiredJwtException e){
             System.out.println("UserController - Login non ok - JWT Scaduto - ERRORE E: "+ e.getMessage());
-            return new ResponseEntity<List<UsersDTO>>(HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login non ok - JWT Scaduto - ERRORE E: "+ e.getMessage());
         }catch (Exception e){
             System.out.println("UserController - Login non ok - Username non trovato - ERRORE E: "+ e.getMessage());
-            return new ResponseEntity<List<UsersDTO>>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Login non ok - User not found - ERRORE E:"+ e.getMessage());
         }
     }
 
@@ -66,30 +72,19 @@ public class UserController {
         String username = loginmodel.getUsername();
         String password = loginmodel.getPassword();
 
-        int res = userService.checkPasswordUser(username,password);
-        //System.out.println(userService.verify(user));
-        if (res == 1){
+        if (userService.checkPasswordUser(username,password)){
             Users user = userService.GetUserbyUsername(username);
             String token = userService.generateToken(user);
             System.out.println(token);
             user.setToken(token);
             userService.save(user);
             System.out.println("Login eseguito con successo - JWT: " + token);
-            return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(token,new Date(System.currentTimeMillis())));
-        }else if (res == -1) {
-            System.out.println("Login Fallito - Username errato");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login fallito");
+            return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(token,new Date(System.currentTimeMillis()+ (1000 * 60) * EXPIRATION_TIME)));
         }else {
             System.out.println("Login Fallito - Username errato");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login fallito");
         }
     }
-
-    //@PostMapping(value = "/Login2")
-    //public String login(
-    //        @RequestBody LoginModelDTO loginmodel){
-    //    return userService.verifyCredential(loginmodel);
-    //}
 }
 
 
