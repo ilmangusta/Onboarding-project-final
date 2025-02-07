@@ -28,12 +28,12 @@ public class PollBatchService {
     private RabbitMQProducer rabbitMQProducer;
 
 
-    @Scheduled(cron = "0 0 0 * * ?") // Ogni giorno a mezzanotte
+    @Scheduled(cron = "0 40 15 * * ?") // Ogni giorno a mezzanotte
     public void processExpiredPolls() {
+        System.out.println("Partito scheduler per segnalare expired i poll e inviare mail...");
         List<Poll> expiringPolls = pollRepository.findExpiringPollsToday();
-
         for (Poll poll : expiringPolls) {
-            processPoll(poll);
+            this.processPoll(poll);
         }
     }
 

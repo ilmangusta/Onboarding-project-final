@@ -1,7 +1,9 @@
 package com.pollsystem.simpleproject.services;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RabbitMQConsumer {
 
     @RabbitListener(queues = "poll.winner.mail")
