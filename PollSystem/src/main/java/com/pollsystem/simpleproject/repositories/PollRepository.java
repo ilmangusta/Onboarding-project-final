@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface PollRepository extends JpaRepository<Poll, Long> {
 
-    @Query("SELECT p FROM Poll p WHERE p.expiresAt <= CURRENT_DATE and AND p.status != 'EXPIRED'")
+    @Query("SELECT p FROM Poll p WHERE p.expiresAt <= CURRENT_DATE AND p.status != 'EXPIRED'")
     List<Poll> findExpiringPollsToday();
 
     //supporto per la paginazione
