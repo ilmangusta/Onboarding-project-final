@@ -98,6 +98,7 @@ public class PollController {
         Users user = userService.GetUserbyUsername(auth_username);
         Poll poll = pollService.GetPollById(id);
         return pollService.GetPollDetails(poll,user);
+        //manca poca roba
     }
 
     @GetMapping(value = "/polls/{id}/vote-TODO")
