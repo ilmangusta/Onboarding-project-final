@@ -32,7 +32,7 @@ public class PollBatchService {
     private WinnerOptionRepository winnerOptionRepository;
 
 
-    @Scheduled(cron = "59 * * * * ?") // Ogni giorno a mezzanotte
+    @Scheduled(cron = "59 59 23 * * ?") // Ogni giorno a mezzanotte
     public void processExpiredPolls() {
         System.out.println("Partito scheduler per segnalare expired i poll e inviare mail...");
         List<Poll> expiringPolls = pollRepository.findExpiringPollsToday();

@@ -63,7 +63,7 @@ public class PollController {
 
     @GetMapping(value = "/polls")
     public PollListPage getPolls(
-            @RequestParam String search,
+            @RequestParam(required = false) String search,
             @RequestParam int page,
             @RequestParam int size) {
         return pollService.getPollsPage(search,page, size);
