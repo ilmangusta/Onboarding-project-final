@@ -28,7 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private MyUserDetailService myUserDetailService;
 
     @Override
-    //customfilter added before the UsernamePasswordAuthenticationFilter
+    //questo customfilter (livello di jwt security) viene aggiunto prima del UsernamePasswordAuthenticationFilter (UPAF)
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ExpiredJwtException {
         //before the UPAF im getting the bearer token
         // Bearer ${token}
@@ -39,7 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
         System.out.println("JwtFilter - AuthHeader = " + authHeader);
         System.out.println("JwtFilter - Cookies = " + cookies);
 
-        //try {
+        //qui il try catch è essenziale per gesitre le eccezioni di accesso non consentito o accesso con token scaduto 
+        try {
             //vuol dire che non è autenticato con il token jwt
             if (authHeader != null && authHeader.startsWith("Bearer")) {
                 token = authHeader.substring(7);
@@ -68,10 +69,18 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
             //}catch (){}
-        //}catch (ExpiredJwtException e ){
-        //    System.out.println("JwtFilter - JWT Scaduto!");
-        //}catch (Exception e){
-        //    System.out.println("JwtFilter - Other Error!");
-        //}
+        }catch (ExpiredJwtException e) {
+                System.out.println("JwtFilter - Accesso negato - Token scaduto!");
+                // Restituisci risposta JSON con errore 401 Unauthorized
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("Accesso non autorizzato");
+        }catch (Exception e){
+            System.out.println("JwtFilter - Other Error!");
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            response.getWriter().write("Internal server error");
+
+        }
     }
 }

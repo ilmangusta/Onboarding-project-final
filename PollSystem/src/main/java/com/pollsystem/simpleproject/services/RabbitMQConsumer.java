@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RabbitMQConsumer {
 
-    @RabbitListener(queues = "poll.winner.mail")
+    //@RabbitListener(queues = "poll.winner.mail")
     public void receiveMessage(String message) {
         System.out.println("Messaggio ricevuto dalla coda: " + message);
         ObjectMapper objectMapper = new ObjectMapper();

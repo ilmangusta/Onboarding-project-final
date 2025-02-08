@@ -14,17 +14,15 @@ import java.nio.file.AccessDeniedException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    //Gli handler di eccezioni definiti con @ExceptionHandler vengono eseguiti solo per le eccezioni che si
+    // verificano all'interno del ciclo di gestione delle richieste di Spring MVC ovvero
+    // Quando l'eccezione si verifica in un Controller
+
     @ExceptionHandler(IllegalArgumentException.class)
     public String handleIllegalArgumentException(IllegalArgumentException e, Model model) {
         model.addAttribute("error", e.getMessage());
         return "/errors/notfound";  // Reindirizza alla pagina di errore
     }
-
-    //@ExceptionHandler(Exception.class)
-    //public String Exceptionhandler(Exception e) {
-    //    //model.addAttribute("error", e.getMessage());
-    //    return "SomeErroroccurred";  // Reindirizza alla pagina di errore
-    //}
 
     // non trovato → 404
     @ExceptionHandler(ChangeSetPersister.NotFoundException.class)
