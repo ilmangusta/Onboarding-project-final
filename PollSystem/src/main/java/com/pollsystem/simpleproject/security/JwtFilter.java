@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
         System.out.println("JwtFilter - AuthHeader = " + authHeader);
         System.out.println("JwtFilter - Cookies = " + cookies);
 
-        //qui il try catch è essenziale per gesitre le eccezioni di accesso non consentito o accesso con token scaduto 
+        //qui il try catch è essenziale per gesitre le eccezioni di accesso non consentito o accesso con token scaduto
         try {
             //vuol dire che non è autenticato con il token jwt
             if (authHeader != null && authHeader.startsWith("Bearer")) {
