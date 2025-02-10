@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +24,13 @@ public class Users {
     private String password;
     private String email;
     private String token = "";
+
+    @JsonIgnore
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.REMOVE
+    )
+    private Set<Vote> vote = new HashSet<>();
 
     public Users(String username, String password, String email) {
         this.username = username;

@@ -23,6 +23,13 @@ public class Vote {
     @ManyToOne(
             cascade = CascadeType.PERSIST
     )
+    @JoinColumn(name = "user_id")
+    private Users user;
+
+    @JsonIgnore
+    @ManyToOne(
+            cascade = CascadeType.PERSIST
+    )
     @JoinColumn(name = "option_id")
     private Option option;
 
